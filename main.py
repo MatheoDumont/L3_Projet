@@ -2,9 +2,9 @@
 
 from env import Env
 
-ENV = Env()
+ENV = Env(20)
 
 if __name__ == "__main__":
     for i in range(1,100):
-    	ENV.computeGeneration()
+    	ENV.computeGeneration(100)
     ENV.disconnect()

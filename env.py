@@ -1,7 +1,8 @@
 import pybullet as p
 import pybullet_data
 import time
-from robot import Robot
+from Robot import Robot
+import numpy as np
 
 
 class Env:
@@ -24,12 +25,15 @@ class Env:
 
     def load_robots(self):
         start_pos = [0, 0, 1]
+        start_poses = np.random.randn(self.nb_robot, 3) * 4
+        start_poses[:,2] = 1
+        #print(start_poses)
         start_orientation = p.getQuaternionFromEuler([0, 0, 0])
 
         # On instancie nos robots mais pour
         # l'instant ils ont tous la même position
         for i in range(self.nb_robot):
-            self.robots[i] = Robot(start_pos, start_orientation)
+            self.robots.append(Robot(start_poses[i], start_orientation))
 
         # Quand la génération est finie, on peut appeler computeFitness pour chaque robot
 
@@ -47,8 +51,8 @@ class Env:
         Pour calculer une étape pour le moteur et l'algo
         on calcule le step de chaque robot
         """
-        for i in range(self.nb_robot):
-            self.robots.step(num)
+        for robot in self.robots:
+            robot.step(num)
 
         p.stepSimulation(self.physicsClient)
         time.sleep(1. / 200.)

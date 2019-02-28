@@ -34,6 +34,7 @@ class Robot:
         # distance entre son centre et le sol
         self.means_distance_from_ground = (self.means_distance_from_ground +
                                            self.getDistanceFromGround()) / num_step
+        self.moveRobot(10, -10)
 
     def getDistanceFromGround(self):
         # x z y, le y nous indique la proximité du sol et le centre du robot
