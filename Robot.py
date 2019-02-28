@@ -47,13 +47,17 @@ class Robot:
         """
         ON CALCULE LA FITNESS A LA FIN
 
-        Pour la fitness, on regarde la distance parcourue 
+        Pour la fitness, on regarde la distance parcourue
         ainsi que s'il est couché sur le sol ou toujours debout.
 
         Plus on est proche de 1 donc de la position debout
         plus on gagne de point
-        75 % pour la moyenne de distance par rapport au sol
+
+		"means_distance_from_ground" est calculé à nouveau à chaque step
+		pour avoir la moyenne de la run
+
+        75 % pour "means_distance_from_ground"
         25 % pour la distance parcourue depuis le départ de la run pour le robot
         """
-        return (self.means_distance_from_ground * 0.75 + self.start_pos[0] * 0.25)
-        
+        return (self.means_distance_from_ground * 0.75 + 
+        	abs((p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25))

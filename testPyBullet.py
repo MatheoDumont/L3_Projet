@@ -26,6 +26,7 @@ for i in range(10000):
         controlMode=p.VELOCITY_CONTROL,
         targetVelocity=100
     )
+    print(p.getBasePositionAndOrientation(boxId)[0][0])
     cubePos, cubeOrn = p.getBasePositionAndOrientation(boxId)
     # x z y, le y nous indique la proximité du sol et le centre du robot
     torpint = 'POS x={} | z={} | y={} || ANGLE x={} | z={} | y={} '.format(
