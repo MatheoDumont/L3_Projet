@@ -31,16 +31,24 @@ class Env:
         for i in range(self.nb_robot):
             self.robots[i] = Robot(start_pos, start_orientation)
 
+        # Quand la génération est finie, on peut appeler computeFitness pour chaque robot
+
     def load_plane(self):
         self.planeId = p.loadURDF("plane.urdf")
 
-    def step(self):
+
+    def computeGeneration(self, length_gen):
+
+        for i in range(1,length_gen):
+            self.step(i)
+
+    def step(self, num):
         """
         Pour calculer une étape pour le moteur et l'algo
         on calcule le step de chaque robot
         """
         for i in range(self.nb_robot):
-            self.robots.step()
+            self.robots.step(num)
 
         p.stepSimulation(self.physicsClient)
         time.sleep(1. / 200.)

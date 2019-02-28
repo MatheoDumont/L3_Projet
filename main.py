@@ -5,6 +5,6 @@ from env import Env
 ENV = Env()
 
 if __name__ == "__main__":
-    while True:
-        ENV.step()
+    for i in range(1,100):
+    	ENV.computeGeneration()
     ENV.disconnect()
