@@ -1,11 +1,12 @@
 import pybullet as p
 import pybullet_data
 import time
+from robot import Robot
 
 
 class Env:
 
-    def __init__(self, graphic=True):
+    def __init__(self, graphic=True,nb_robot=100):
 
         if graphic:
             self.physicsClient = p.connect(p.GUI)
@@ -16,43 +17,33 @@ class Env:
         p.setGravity(0, 0, -10)
 
         # Init
-        self.robotId = 0
-        self.load_robot()
+        self.nb_robot = nb_robot
+        self.robots = []
+        self.load_robots()
         self.load_plane()
 
-    def load_robot(self):
+    def load_robots(self):
         cubeStartPos = [0, 0, 1]
         cubeStartOrientation = p.getQuaternionFromEuler([0, 0, 0])
 
-        self.robotId = p.loadURDF(
-            "balance.urdf", cubeStartPos, cubeStartOrientation)
-        self.left_join = 0
-        self.right_join = 1
+        # On instancie nos robots mais pour
+        # l'instant ils ont tous la même position
+        for i in range(self.nb_robot):
+            self.robots[i] = Robot(cubeStartPos, cubeStartOrientation)
 
     def load_plane(self):
         self.planeId = p.loadURDF("plane.urdf")
 
     def step(self):
         """
-                Pour calculer une étape pour le moteur et l'algo
-                """
+        Pour calculer une étape pour le moteur et l'algo
+        on calcule le step de chaque robot
+        """
+        for i in range(self.nb_robot):
+            self.robots.step()
+
         p.stepSimulation(self.physicsClient)
         time.sleep(1. / 200.)
-
-
-    def moveRobot(self, left_speed, right_speed):
-        """
-                Pour faire avancer le robot
-                """
-        pass
-
-    def getDistanceFromGround(self):
-        # x z y, le y nous indique la proximité du sol et le centre du robot
-        cubePos, cubeOrn = p.getBasePositionAndOrientation(self.robotId)
-        return cubePos[2]  # y, si < 0.15, on peut estimer qu'il est horizontal
-
-    def getAngleWithGround(self):
-        pass
 
     def save(self):
         """
