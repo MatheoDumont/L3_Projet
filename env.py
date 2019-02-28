@@ -23,13 +23,13 @@ class Env:
         self.load_plane()
 
     def load_robots(self):
-        cubeStartPos = [0, 0, 1]
-        cubeStartOrientation = p.getQuaternionFromEuler([0, 0, 0])
+        start_pos = [0, 0, 1]
+        start_orientation = p.getQuaternionFromEuler([0, 0, 0])
 
         # On instancie nos robots mais pour
         # l'instant ils ont tous la même position
         for i in range(self.nb_robot):
-            self.robots[i] = Robot(cubeStartPos, cubeStartOrientation)
+            self.robots[i] = Robot(start_pos, start_orientation)
 
     def load_plane(self):
         self.planeId = p.loadURDF("plane.urdf")
