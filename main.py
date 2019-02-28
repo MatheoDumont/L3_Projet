@@ -1,9 +1,10 @@
+# pylint: disable=W0312, C0111
+
 from env import Env
 
-env = Env()
+ENV = Env()
 
 if __name__ == "__main__":
-	while True:
-		env.step()
-	env.disconnect()
-
+    while True:
+        ENV.step()
+    ENV.disconnect()
