@@ -1,5 +1,6 @@
 import pybullet as p
 
+from genetic import *
 
 class Robot:
 
@@ -11,6 +12,11 @@ class Robot:
         self.right_join = 1
 
         self.means_distance_from_ground = 1
+        self.genes = []
+        self.model = None
+        self.num_step = 0
+        self.vitesse = 1
+        self.alive = True
 
     def moveRobot(self, left_speed, right_speed):
         """
@@ -29,12 +35,26 @@ class Robot:
             targetVelocity=right_speed
         )
 
-    def step(self, num_step):
+    def step(self):
         # on fait la moyenne pour la run du robot de la
         # distance entre son centre et le sol
+        self.num_step += 1
         self.means_distance_from_ground = (self.means_distance_from_ground +
-                                           self.getDistanceFromGround()) / num_step
-        self.moveRobot(10, -10)
+                                           self.getDistanceFromGround()) / self.num_step
+        if self.alive:
+            self.predict_vitesse()
+            self.moveRobot(self.vitesse, -self.vitesse)
+
+            if self.getDistanceFromGround() < 0.04:
+                self.alive = False
+
+
+    def predict_vitesse(self):
+        predict_input = np. array([self.vitesse, self.getDistanceFromGround()]).reshape(1, 2)
+        self.vitesse = min(100, self.model.predict_on_batch([predict_input]))
+
+    def load_model(self):
+        self.model = gen_NN(self.genes)
 
     def getDistanceFromGround(self):
         # x z y, le y nous indique la proximité du sol et le centre du robot
@@ -60,5 +80,12 @@ class Robot:
         75 % pour "means_distance_from_ground"
         25 % pour la distance parcourue depuis le départ de la run pour le robot
         """
-        return (self.means_distance_from_ground * 0.75 + 
-        	abs((p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25))
+        return (self.means_distance_from_ground * 0.75 +
+            abs((p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25))
+
+    def reset(self):
+        self.alive = True
+        self.vitesse = 1
+        self.num_step = 0
+        self.means_distance_from_ground = 1
+

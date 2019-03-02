@@ -18,41 +18,19 @@ from multiprocessing.dummy import Pool as ThreadPool
 from concurrent.futures import ThreadPoolExecutor
 from tensorflow.python.client import device_lib
 """
-from piece import *
-from bot import *
-from utils import *
 
 # import os
 
 
 def gen_NN(genes=[]):
     # Inputs
-    pieces_input = Input(shape=(3 * 7 + 1,))
-    board_input = Input(shape=(10, 20, 1))
+    input = Input(shape=(2,))
 
-    # First convolution extracts 16 filters that are 3x3
-    # Convolution is followed by max-pooling layer with a 2x2 window
-    conv_l = Conv2D(32, 2, activation='relu')(board_input)
-    conv_l = MaxPooling2D(2)(conv_l)
-
-    # Second convolution extracts 32 filters that are 3x3
-    # Convolution is followed by max-pooling layer with a 2x2 window
-    conv_l = Conv2D(64, 2, activation='relu')(conv_l)
-    conv_l = MaxPooling2D(2)(conv_l)
-
-    # Third convolution extracts 64 filters that are 3x3
-    # Convolution is followed by max-pooling layer with a 2x2 window
-
-    conv_l = Flatten()(conv_l)
-
-    x = keras.layers.concatenate([conv_l, pieces_input])
-
-    x = Dense(60, activation='relu')(x)
+    x = Dense(60, activation='relu')(input)
     x = Dense(40, activation='relu')(x)
-    predictions = Dense(11, activation='softmax')(x)
+    predictions = Dense(1, activation='relu')(x)
 
-    model = Model(inputs=[board_input, pieces_input], outputs=predictions)
-    # print(model.summary())
+    model = Model(inputs=input, outputs=predictions)
 
     if len(genes) > 0:
         model.set_weights(genes)
@@ -90,8 +68,8 @@ def mutate(genes, nb, coeff):
 
 
 def mutate_list(list_bot, nb, coeff):
-    length = len(list_bot)
-    for i in range(0, length):
+    l = len(list_bot)
+    for i in range(0, l):
         mutate(list_bot[i], max(0, nb - (l - i)), coeff)
 
     return list_bot
