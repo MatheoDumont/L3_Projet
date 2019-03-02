@@ -58,12 +58,12 @@ class Gen_algo:
 
             # croisement
             #print("croisement")
-            for k in range(1, l):
+            for k in range(0, l-1):
 
-                b1 = new_list_genes[l - k]
-                b2 = new_list_genes[l - k - 1]
+                b1 = new_list_genes[k]
+                b2 = new_list_genes[k+1]
 
-                list_genes.append(b1)
+                #list_genes.append(b1)
                 # list_genes.append(b2)
 
                 list_croisement = croisement(b1, b2, 10)

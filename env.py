@@ -87,7 +87,7 @@ class Env:
 
     def reset(self):
         start_poses = np.random.randn(self.nb_robot, 3) * 3
-        start_poses[:,2] = 0
+        start_poses[:,2] = 1
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
         for i in range(self.nb_robot):
             robot = self.robots[i]

@@ -43,15 +43,15 @@ class Robot:
                                            self.getDistanceFromGround()) / self.num_step
         if self.alive:
             self.predict_vitesse()
-            self.moveRobot(self.vitesse, -self.vitesse)
+            self.moveRobot(self.vitesse, self.vitesse)
 
             if self.getDistanceFromGround() < 0.04:
                 self.alive = False
 
 
     def predict_vitesse(self):
-        predict_input = np. array([self.vitesse, self.getDistanceFromGround()]).reshape(1, 2)
-        self.vitesse = min(100, self.model.predict_on_batch([predict_input]))
+        predict_input = np.array([self.vitesse, self.getDistanceFromGround()]).reshape(1, 2)
+        self.vitesse = min(100, self.model.predict_on_batch([predict_input]) * 100)
 
     def getAngularSpeed(self):
         linear, angular = p.getBaseVelocity(self.robotId)
