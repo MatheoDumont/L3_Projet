@@ -53,6 +53,10 @@ class Robot:
         predict_input = np. array([self.vitesse, self.getDistanceFromGround()]).reshape(1, 2)
         self.vitesse = min(100, self.model.predict_on_batch([predict_input]))
 
+    def getAngularSpeed(self):
+        linear, angular = p.getBaseVelocity(self.robotId)
+        return angular
+
     def load_model(self):
         self.model = gen_NN(self.genes)
 
