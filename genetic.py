@@ -28,7 +28,7 @@ def gen_NN(genes=[]):
 
     x = Dense(60, activation='relu')(input)
     x = Dense(40, activation='relu')(x)
-    predictions = Dense(1, activation='relu')(x)
+    predictions = Dense(1, activation='sigmoid')(x)
 
     model = Model(inputs=input, outputs=predictions)
 

@@ -10,7 +10,7 @@ from env import Env
 from genetic import *
 
 class Gen_algo:
-    def __init__(self,graphic=False, nb_steps=1000, nb_start_pop=100, nb_gen=100):
+    def __init__(self,graphic=False, nb_steps=1000, nb_start_pop=100, nb_gen=10000):
         self.nb_steps = nb_steps  # nb de move par run
         self.nb_start_pop = nb_start_pop  # nb de robot dans la pop de depart
         self.list_genes = []
