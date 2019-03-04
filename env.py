@@ -1,15 +1,15 @@
 import pybullet as p
 import pybullet_data
-import time
+# import time
 from Robot import Robot
 import numpy as np
 from genetic import *
-import keras
+# import keras
 
 
 class Env:
 
-    def __init__(self, graphic=True,nb_robot=100):
+    def __init__(self, graphic=True, nb_robot=100):
 
         if graphic:
             self.physicsClient = p.connect(p.GUI)
@@ -18,6 +18,9 @@ class Env:
 
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -10)
+
+        if graphic:
+            p.setTimeStep(0.01)
 
         # Init
         self.nb_robot = nb_robot
@@ -29,7 +32,7 @@ class Env:
         # list des positions initiales des robots qui seront aleatoires
         start_poses = np.random.randn(self.nb_robot, 3) * 3
         # on fixe la hauteur a 1
-        start_poses[:,2] = 1
+        start_poses[:, 2] = 0.3
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
 
         # On instancie nos robots mais pour
@@ -57,7 +60,6 @@ class Env:
             if self.step() < 1:
                 break
 
-
     def step(self):
         """
         Pour calculer une étape pour le moteur et l'algo
@@ -71,7 +73,6 @@ class Env:
                 nb_alive -= 1
 
         p.stepSimulation(self.physicsClient)
-        #time.sleep(1. / 20000.)
 
         return nb_alive
 
@@ -87,9 +88,10 @@ class Env:
 
     def reset(self):
         start_poses = np.random.randn(self.nb_robot, 3) * 3
-        start_poses[:,2] = 1
+        start_poses[:, 2] = 0.3
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
         for i in range(self.nb_robot):
             robot = self.robots[i]
             robot.reset()
-            p.resetBasePositionAndOrientation(robot.robotId, start_poses[i], start_orientation)
+            p.resetBasePositionAndOrientation(
+                robot.robotId, start_poses[i], start_orientation)

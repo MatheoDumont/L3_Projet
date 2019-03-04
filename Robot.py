@@ -17,6 +17,7 @@ class Robot:
         self.num_step = 0
         self.vitesse = 1
         self.alive = True
+        self.tick_stand_up = 0
 
     def moveRobot(self, left_speed, right_speed):
         """
@@ -39,9 +40,11 @@ class Robot:
         # on fait la moyenne pour la run du robot de la
         # distance entre son centre et le sol
         self.num_step += 1
-        self.means_distance_from_ground = (self.means_distance_from_ground +
-                                           self.getDistanceFromGround()) / self.num_step
+        
         if self.alive:
+            self.tick_stand_up += 1
+            self.means_distance_from_ground = (self.means_distance_from_ground +
+                                           self.getDistanceFromGround()) / self.num_step
             self.predict_vitesse()
             self.moveRobot(self.vitesse, self.vitesse)
 
@@ -80,16 +83,20 @@ class Robot:
 
 		"means_distance_from_ground" est calculé à nouveau à chaque step
 		pour avoir la moyenne de la run
-
-        75 % pour "means_distance_from_ground"
+        
+        50 % pour le nombre de tick resté debout
+        25 % pour "means_distance_from_ground"
         25 % pour la distance parcourue depuis le départ de la run pour le robot
         """
-        return (self.means_distance_from_ground * 0.75 +
-            abs((p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25))
+        
+
+        return (self.means_distance_from_ground * 0.25 + (self.tick_stand_up / 10) * 0.5 +
+            abs(p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25)
 
     def reset(self):
         self.alive = True
         self.vitesse = 1
         self.num_step = 0
         self.means_distance_from_ground = 1
+        self.tick_stand_up = 0
 

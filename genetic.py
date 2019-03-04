@@ -1,4 +1,4 @@
-from tkinter import *
+# from tkinter import *
 # import gc
 # import time
 import numpy as np
@@ -8,7 +8,7 @@ import random
 # import pandas as pd
 # from tqdm import tqdm
 from keras.models import Model
-from keras.layers import Dense, Input, Flatten, Conv2D, MaxPooling2D
+from keras.layers import Dense, Input
 """
 import keras.backend as K
 import tensorflow
