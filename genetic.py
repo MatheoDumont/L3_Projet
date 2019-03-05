@@ -9,6 +9,7 @@ import random
 # from tqdm import tqdm
 from keras.models import Model
 from keras.layers import Dense, Input
+import math
 """
 import keras.backend as K
 import tensorflow
@@ -89,11 +90,11 @@ def mutate_list(list_genes, nb, coeff):
     return list_genes
 
 
-def selection(list_bot, max): # max: le nombre maximale de bot qui seront selectionne
-    new_list_bot = []
-    new_list_bot.append(list_bot[0]) # on selectionne le premier notament car log(0) existe pas
-    for i in range(1, len(list_bot)):
+def selection(list_genes, max): # max: le nombre maximale de bot qui seront selectionne
+    new_list_genes = []
+    new_list_genes.append(list_genes[0]) # on selectionne le premier notament car log(0) existe pas
+    for i in range(1, len(list_genes)):
         # les bots sont tries par fitness, plus le bot courant est loin dans la liste moins il a de chances d'etre selectionne
-        if not len(new_list_bot) > max  and random.uniform(0, math.log(i)) <= 1:
-            new_list_bot.append(list_bot[i])
-    return new_list_bot
+        if not len(new_list_genes) > max  and random.uniform(0, math.log(i)) <= 1:
+            new_list_genes.append(list_genes[i])
+    return new_list_genes

@@ -15,8 +15,11 @@ class Gen_algo:
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop)
 
         self.nb_boss = int(self.nb_start_pop * 0.1) if self.nb_start_pop > 10 else 10
+
         # *2 pour le croisement qui se fait par pair de parent
         self.nb_children_from_cross = int(self.nb_start_pop * 0.1) * 2
+        self.nb_to_cross = self.nb_boss - 2
+
 
     def start(self):
         # boucle de generation
@@ -30,7 +33,9 @@ class Gen_algo:
             # pas besoins de load_genes la premiere fois, alors que les robots
             # ont déjà été initialisés
             if num_gen != 1:
+                print(len(self.list_genes))
                 self.env.load_genes(self.list_genes)
+                self.list_genes = []
 
             # ON FAIT JOUER CHAQUE ROBOT
             self.env.computeGeneration(self.nb_steps)
@@ -49,9 +54,16 @@ class Gen_algo:
             # SELECTION DES MEILLEURS ROBOTS
             new_list_genes = []
             
-            for j in range(0, self.nb_boss):
+            for j in range(0, len(list_robots)):
                 new_list_genes.append(list_robots[j].model.get_weights())
             
+            new_list_genes = selection(new_list_genes, self.nb_to_cross)
+
+            # Si on selectionne pas assez de gene
+
+            if len(new_list_genes) < self.nb_to_cross:
+                for i in range(0, self.nb_to_cross - len(new_list_genes)):
+                    new_list_genes.append(list_robots[i].model.get_weights())
 
             size_genes_from_boss = len(new_list_genes)
 
@@ -63,11 +75,19 @@ class Gen_algo:
                 b2 = new_list_genes[k+1]
 
                 # CROISEMENT 
-                list_genes_croisement = croisement(b1, b2, self.nb_children_from_cross)
+                # list_genes_croisement = croisement(b1, b2, self.nb_children_from_cross)
+                for gene in croisement(b1, b2, self.nb_children_from_cross):
+                    self.list_genes.append(gene)
 
                 # MUTATIONS
-                for gene in mutate_list(list_genes_croisement, self.nb_children_from_cross / 2, 2):
-                    self.list_genes.append(gene)
+                """for gene in mutate_list(list_genes_croisement, self.nb_children_from_cross / 2, 2):
+                                                                    self.list_genes.append(gene)"""
+
+            
+            # On ajoute directement les meilleurs bots de cette génération à la suivante
+            for i in range(0, self.nb_boss - self.nb_to_cross):
+                print("pute")
+                self.list_genes.append(list_robots[i].model.get_weights())
 
             self.env.reset()
 
