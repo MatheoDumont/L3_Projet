@@ -45,7 +45,7 @@ def croisement(w1, w2, nb_enfants):
     renvoie le croisement entre les poids des 2 parents
     c'est a dire 2 enfants avec des poids qui seront un mixte des parents
     """
-    list_enfants = []
+    list_genes_children = []
 
     for i in range(0, nb_enfants):
         # nombre aleatoire compris entre - 0.5 et 1.5
@@ -55,21 +55,33 @@ def croisement(w1, w2, nb_enfants):
         # poids du nouvel enfant
         e = np.multiply(p, w1) + np.multiply(w2, (1 - p))
 
-        list_enfants.append(e)
-    return list_enfants
+        list_genes_children.append(e)
+    return list_genes_children
 
 
 def mutate(genes, nb, coeff):
     for k in range(0, len(genes)):
+        
         # on skip les couches qui qui n'ont pas de poids
-        if len(genes[k].shape) > 1 and random.randint(0, nb == 0):
+        # ou celles qu'on ne veut pas muter pour les garder 
+        # telles qu'elles sont
+
+        if len(genes[k].shape) > 1 and random.randint(0, nb) == 0:
+
             matrice_muta = np.random.random(genes[k].shape)
+
             genes[k] += np.multiply(matrice_muta - 0.5, coeff)
 
 
-def mutate_list(list_bot, nb, coeff):
-    l = len(list_bot)
-    for i in range(0, l):
-        mutate(list_bot[i], max(0, nb - (l - i)), coeff)
+def mutate_list(list_genes, nb, coeff): 
 
-    return list_bot
+    size_list_genes = len(list_genes)
+
+    # En fonction de nb, les plus ou mois premiers genes reçus ne seront pas mutés
+    # si n est égale à la moitié de size_list_genes donc à la moitié des genes donnés à mutés
+    # seulement la seconde partie sera muté
+    
+    for i in range(0, size_list_genes):
+        mutate(list_genes[i], max(0, nb - (size_list_genes - i)), coeff)
+
+    return list_genes

@@ -53,7 +53,8 @@ class Env:
             else:
                 genes = list_genes[i]
             robot.genes = genes
-            robot.model = gen_NN(genes)
+            # robot.model = gen_NN(genes)
+            robot.model.set_weights(genes)
 
     def computeGeneration(self, length_gen):
         for i in range(length_gen):

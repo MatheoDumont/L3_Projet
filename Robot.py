@@ -13,7 +13,7 @@ class Robot:
 
         self.means_distance_from_ground = 1
         self.genes = []
-        self.model = None
+        self.model = gen_NN()
         self.num_step = 0
         self.vitesse = 1
         self.alive = True
@@ -48,7 +48,7 @@ class Robot:
             self.predict_vitesse()
             self.moveRobot(self.vitesse, self.vitesse)
 
-            if self.getDistanceFromGround() < 0.04:
+            if self.getDistanceFromGround() < 0.15:
                 self.alive = False
 
 

@@ -1,9 +1,5 @@
-import pybullet as p
-import pybullet_data
-import time
-from Robot import Robot
+# import time
 import numpy as np
-import genetic
 import keras
 
 from env import Env
@@ -24,10 +20,10 @@ class Gen_algo:
             print("======================================================")
             print("Generation: ", i)
 
-            keras.backend.clear_session()
+            # keras.backend.clear_session()
 
             list_fitness_overall = []
-            list_lignes_overall = []
+            
             self.env.load_genes(self.list_genes)
 
             # on fait jouer chaque robot
@@ -42,34 +38,28 @@ class Gen_algo:
 
             list_fitness = []
             print("moyenne des fitness: ", np.mean(list_fitness_overall))
-            # selection des x meilleurs robots
-            #print("selection")
+
+            # Selection des x meilleurs robot
             for j in range(0, 10):
                 new_list_genes.append(list_robots[j].genes)
                 list_fitness.append(list_robots[j].computeFitness())
 
             print("resultat des boss: ", list_fitness)
 
-            list_genes = []
+            size_genes_from_boss = len(new_list_genes)
 
-            l = len(new_list_genes)
+            # Croisement
 
-            list_enfants = []
-
-            # croisement
-            #print("croisement")
-            for k in range(0, l-1):
+            for k in range(0, size_genes_from_boss-1):
 
                 b1 = new_list_genes[k]
                 b2 = new_list_genes[k+1]
 
-                #list_genes.append(b1)
-                # list_genes.append(b2)
+                list_genes_croisement = croisement(b1, b2, 10)
 
-                list_croisement = croisement(b1, b2, 10)
-
-                for gene in mutate_list(list_croisement, 6, 2):
+                for gene in mutate_list(list_genes_croisement, 6, 2):
                     self.list_genes.append(gene)
+                    
             self.env.reset()
     def end_algo():
         self.env.disconnect()
