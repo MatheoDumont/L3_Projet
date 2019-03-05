@@ -93,8 +93,39 @@ def mutate_list(list_genes, nb, coeff):
 def selection(list_genes, max): # max: le nombre maximale de bot qui seront selectionne
     new_list_genes = []
     new_list_genes.append(list_genes[0]) # on selectionne le premier notament car log(0) existe pas
+
     for i in range(1, len(list_genes)):
         # les bots sont tries par fitness, plus le bot courant est loin dans la liste moins il a de chances d'etre selectionne
         if not len(new_list_genes) > max  and random.uniform(0, math.log(i)) <= 1:
             new_list_genes.append(list_genes[i])
     return new_list_genes
+
+def pair_cross(list_genes, nb_children_from_cross):
+    # POUR LES PAIRS DE BOSS(meilleurs robots)
+    to_return_list_genes = []
+    size_genes_from_boss = len(list_genes)
+    for k in range(0, size_genes_from_boss-1, 2):
+
+        b1 = list_genes[k]
+        b2 = list_genes[k+1]
+
+        # CROISEMENT 
+        # list_genes_croisement = croisement(b1, b2, self.nb_children_from_cross)
+        for gene in croisement(b1, b2, nb_children_from_cross):
+            to_return_list_genes.append(gene)
+
+        # MUTATIONS
+        """for gene in mutate_list(list_genes_croisement, self.nb_children_from_cross / 2, 2):
+                                                                self.list_genes.append(gene)"""
+                                                                
+def first_cross_with_all_others(list_genes, nb_children_from_cross):
+    to_return_list_genes = []
+    first_gene = list_genes[0]
+
+
+    for i in range(1,len(list_genes)):
+        
+        for gene in croisement(first_gene, list_genes[i], nb_children_from_cross):
+            to_return_list_genes.append(gene)
+
+    return to_return_list_genes

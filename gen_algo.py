@@ -17,8 +17,8 @@ class Gen_algo:
         self.nb_boss = int(self.nb_start_pop * 0.1) if self.nb_start_pop > 10 else 10
 
         # *2 pour le croisement qui se fait par pair de parent
-        self.nb_children_from_cross = int(self.nb_start_pop * 0.1) * 2
-        self.nb_to_cross = self.nb_boss - 2
+        self.nb_children_from_cross = int(self.nb_boss * 0.1)
+        self.nb_to_cross = self.nb_start_pop - int(self.nb_boss * 0.2)
 
 
     def start(self):
@@ -33,7 +33,6 @@ class Gen_algo:
             # pas besoins de load_genes la premiere fois, alors que les robots
             # ont déjà été initialisés
             if num_gen != 1:
-                print(len(self.list_genes))
                 self.env.load_genes(self.list_genes)
                 self.list_genes = []
 
@@ -65,28 +64,11 @@ class Gen_algo:
                 for i in range(0, self.nb_to_cross - len(new_list_genes)):
                     new_list_genes.append(list_robots[i].model.get_weights())
 
-            size_genes_from_boss = len(new_list_genes)
+            self.list_genes = first_cross_with_all_others(new_list_genes, self.nb_children_from_cross*10)
+            self.list_genes = self.list_genes[:self.nb_to_cross]
 
-            # POUR LES PAIRS DE BOSS(meilleurs robots)
-            
-            for k in range(0, size_genes_from_boss-1, 2):
-
-                b1 = new_list_genes[k]
-                b2 = new_list_genes[k+1]
-
-                # CROISEMENT 
-                # list_genes_croisement = croisement(b1, b2, self.nb_children_from_cross)
-                for gene in croisement(b1, b2, self.nb_children_from_cross):
-                    self.list_genes.append(gene)
-
-                # MUTATIONS
-                """for gene in mutate_list(list_genes_croisement, self.nb_children_from_cross / 2, 2):
-                                                                    self.list_genes.append(gene)"""
-
-            
             # On ajoute directement les meilleurs bots de cette génération à la suivante
-            for i in range(0, self.nb_boss - self.nb_to_cross):
-                print("pute")
+            for i in range(0,self.nb_to_cross - self.nb_boss):
                 self.list_genes.append(list_robots[i].model.get_weights())
 
             self.env.reset()
