@@ -39,10 +39,9 @@ class Env:
 
         if reset:
             for i in range(self.nb_robot):
-                robot = self.robots[i]
-                robot.reset()
+                self.robots[i].reset()
                 p.resetBasePositionAndOrientation(
-                    robot.robotId, start_poses[i], start_orientation)
+                    self.robots[i].robotId, start_poses[i], start_orientation)
 
         elif not reset:
             for i in range(self.nb_robot):
