@@ -3,7 +3,7 @@ import pybullet_data
 # import time
 from Robot import Robot
 import numpy as np
-from genetic import *
+
 # import keras
 
 
@@ -27,34 +27,52 @@ class Env:
         self.robots = []
         self.load_robots()
         self.load_plane()
+        self.load_collision()
 
-    def load_robots(self, list_genes=[]):
+    def load_robots(self, reset=False):
         # list des positions initiales des robots qui seront aleatoires
         start_poses = np.random.randn(self.nb_robot, 3) * 3
-        # on fixe la hauteur a 1
+
+        # on fixe la hauteur a 0.3
         start_poses[:, 2] = 0.3
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
 
-        # On instancie nos robots mais pour
-        # l'instant ils ont tous la même position
-        for i in range(self.nb_robot):
-            self.robots.append(Robot(start_poses[i], start_orientation))
+        if reset:
+            for i in range(self.nb_robot):
+                robot = self.robots[i]
+                robot.reset()
+                p.resetBasePositionAndOrientation(
+                    robot.robotId, start_poses[i], start_orientation)
 
-        # Quand la génération est finie, on peut appeler computeFitness pour chaque robot
+        elif not reset:
+            for i in range(self.nb_robot):
+                self.robots.append(Robot(start_poses[i], start_orientation))
+
+    def load_collision(self):
+        # Doit être appelé après avoir générer les robots et le plateau
+        for i in range(0, len(self.robots)):
+            # On désactive les collisions entre les robots,
+            # en pratique chaque robot a son propore groupe et mask
+            # avec i, donc aucun ne peuvent avoir de collision entre eux
+            p.setCollisionFilterGroupMask(self.robots[i].robotId, -1, i, i)
+
+            # On rend la collision possible avec le sol
+            p.setCollisionFilterPair(
+                self.robots[i].robotId, self.planeId, -1, -1, 1)
 
     def load_plane(self):
         self.planeId = p.loadURDF("plane.urdf")
 
     def load_genes(self, list_genes):
+        size_list_genes = len(list_genes)
+
         for i in range(self.nb_robot):
             robot = self.robots[i]
-            if len(list_genes) < 1:
-                genes = []
+
+            if size_list_genes < 1:
+                robot.model.set_weights([])
             else:
-                genes = list_genes[i]
-            robot.genes = genes
-            # robot.model = gen_NN(genes)
-            robot.model.set_weights(genes)
+                robot.model.set_weights(list_genes[i])
 
     def computeGeneration(self, length_gen):
         for i in range(length_gen):
@@ -88,11 +106,4 @@ class Env:
         p.disconnect()
 
     def reset(self):
-        start_poses = np.random.randn(self.nb_robot, 3) * 3
-        start_poses[:, 2] = 0.3
-        start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
-        for i in range(self.nb_robot):
-            robot = self.robots[i]
-            robot.reset()
-            p.resetBasePositionAndOrientation(
-                robot.robotId, start_poses[i], start_orientation)
+        self.load_robots(True)

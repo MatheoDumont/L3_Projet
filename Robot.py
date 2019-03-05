@@ -12,7 +12,6 @@ class Robot:
         self.right_join = 1
 
         self.means_distance_from_ground = 1
-        self.genes = []
         self.model = gen_NN()
         self.num_step = 0
         self.vitesse = 1

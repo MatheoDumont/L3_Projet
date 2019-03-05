@@ -28,12 +28,14 @@ def gen_NN(genes=[]):
 
     x = Dense(10, activation='tanh')(input)
     x = Dense(10, activation='tanh')(x)
+
     predictions = Dense(1, activation='tanh')(x)
 
     model = Model(inputs=input, outputs=predictions)
 
     if len(genes) > 0:
         model.set_weights(genes)
+        
     model._make_predict_function()
 
     return model
@@ -80,7 +82,7 @@ def mutate_list(list_genes, nb, coeff):
     # En fonction de nb, les plus ou mois premiers genes reçus ne seront pas mutés
     # si n est égale à la moitié de size_list_genes donc à la moitié des genes donnés à mutés
     # seulement la seconde partie sera muté
-    
+
     for i in range(0, size_list_genes):
         mutate(list_genes[i], max(0, nb - (size_list_genes - i)), coeff)
 
