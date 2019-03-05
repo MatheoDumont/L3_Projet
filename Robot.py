@@ -2,6 +2,7 @@ import pybullet as p
 
 from genetic import *
 
+
 class Robot:
 
     def __init__(self, start_pos, start_orientation):
@@ -39,25 +40,28 @@ class Robot:
         # on fait la moyenne pour la run du robot de la
         # distance entre son centre et le sol
         self.num_step += 1
-        
+
         if self.alive:
             self.tick_stand_up += 1
             self.means_distance_from_ground = (self.means_distance_from_ground +
-                                           self.getDistanceFromGround()) / self.num_step
+                                               self.getDistanceFromGround()) / self.num_step
             self.predict_vitesse()
             self.moveRobot(self.vitesse, self.vitesse)
 
             if self.getDistanceFromGround() < 0.15:
                 self.alive = False
 
-
     def predict_vitesse(self):
-        predict_input = np.array([self.vitesse, self.getDistanceFromGround()]).reshape(1, 2)
-        self.vitesse = min(100, self.model.predict_on_batch([predict_input]) * 100)
+        linear, angular = self.getLinearAndAngularSpeed()
+        
+        predict_input = np.array(
+            [linear[0], linear[1], angular[0], angular[1], self.vitesse, self.getDistanceFromGround()]).reshape(1, 6)
+        self.vitesse = min(
+            100, self.model.predict_on_batch([predict_input]) * 100)
 
-    def getAngularSpeed(self):
+    def getLinearAndAngularSpeed(self):
         linear, angular = p.getBaseVelocity(self.robotId)
-        return angular
+        return linear, angular
 
     def load_model(self):
         self.model = gen_NN(self.genes)
@@ -80,17 +84,16 @@ class Robot:
         Plus on est proche de 1 donc de la position debout
         plus on gagne de point
 
-		"means_distance_from_ground" est calculé à nouveau à chaque step
-		pour avoir la moyenne de la run
-        
+                "means_distance_from_ground" est calculé à nouveau à chaque step
+                pour avoir la moyenne de la run
+
         50 % pour le nombre de tick resté debout
         25 % pour "means_distance_from_ground"
         25 % pour la distance parcourue depuis le départ de la run pour le robot
         """
-        
 
         return (self.means_distance_from_ground * 0.25 + (self.tick_stand_up / 10) * 0.5 +
-            abs(p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25)
+                abs(p.getBasePositionAndOrientation(self.robotId)[0][0]) * 0.25)
 
     def reset(self):
         self.alive = True
@@ -98,4 +101,3 @@ class Robot:
         self.num_step = 0
         self.means_distance_from_ground = 1
         self.tick_stand_up = 0
-

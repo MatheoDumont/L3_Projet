@@ -24,7 +24,7 @@ from tensorflow.python.client import device_lib
 
 def gen_NN(genes=[]):
     # Inputs
-    input = Input(shape=(2,))
+    input = Input(shape=(6,))
 
     x = Dense(10, activation='tanh')(input)
     x = Dense(10, activation='tanh')(x)
@@ -35,7 +35,7 @@ def gen_NN(genes=[]):
 
     if len(genes) > 0:
         model.set_weights(genes)
-        
+
     model._make_predict_function()
 
     return model
