@@ -17,8 +17,14 @@ class Gen_algo:
         self.nb_boss = int(self.nb_start_pop * 0.1) if self.nb_start_pop > 10 else 10
 
         # *2 pour le croisement qui se fait par pair de parent
-        self.nb_children_from_cross = int(self.nb_boss * 0.1)
-        self.nb_to_cross = self.nb_start_pop - int(self.nb_boss * 0.2)
+        self.nb_children_from_each_cross = int(self.nb_boss * 0.1) + 1
+        self.nb_to_cross = self.nb_start_pop - int(self.nb_boss * 0.2) 
+
+        print("---------PARAMETERS----------")
+        print("nb_start_pop: ",self.nb_start_pop)
+        print("nb_boss: ",self.nb_boss)
+        print("nb_children_from_each_cross: ",self.nb_children_from_each_cross)
+        print("nb_to_cross: ",self.nb_to_cross)
 
 
     def start(self):
@@ -59,16 +65,16 @@ class Gen_algo:
             new_list_genes = selection(new_list_genes, self.nb_to_cross)
 
             # Si on selectionne pas assez de gene
-
             if len(new_list_genes) < self.nb_to_cross:
                 for i in range(0, self.nb_to_cross - len(new_list_genes)):
                     new_list_genes.append(list_robots[i].model.get_weights())
 
-            self.list_genes = first_cross_with_all_others(new_list_genes, self.nb_children_from_cross*10)
+            self.list_genes = first_cross_with_all_others(new_list_genes, self.nb_children_from_each_cross)
+            print(len(self.list_genes))
             self.list_genes = self.list_genes[:self.nb_to_cross]
 
             # On ajoute directement les meilleurs bots de cette génération à la suivante
-            for i in range(0,self.nb_to_cross - self.nb_boss):
+            for i in range(0, self.nb_children_from_each_cross):
                 self.list_genes.append(list_robots[i].model.get_weights())
 
             self.env.reset()
