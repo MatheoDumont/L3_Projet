@@ -87,3 +87,13 @@ def mutate_list(list_genes, nb, coeff):
         mutate(list_genes[i], max(0, nb - (size_list_genes - i)), coeff)
 
     return list_genes
+
+
+def selection(list_bot, max): # max: le nombre maximale de bot qui seront selectionne
+    new_list_bot = []
+    new_list_bot.append(list_bot[0]) # on selectionne le premier notament car log(0) existe pas
+    for i in range(1, len(list_bot)):
+        # les bots sont tries par fitness, plus le bot courant est loin dans la liste moins il a de chances d'etre selectionne
+        if not len(new_list_bot) > max  and random.uniform(0, math.log(i)) <= 1:
+            new_list_bot.append(list_bot[i])
+    return new_list_bot
