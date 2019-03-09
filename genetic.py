@@ -64,9 +64,9 @@ def croisement(w1, w2, nb_enfants):
 
 def mutate(genes, nb, coeff):
     for k in range(0, len(genes)):
-        
+
         # on skip les couches qui qui n'ont pas de poids
-        # ou celles qu'on ne veut pas muter pour les garder 
+        # ou celles qu'on ne veut pas muter pour les garder
         # telles qu'elles sont
 
         if len(genes[k].shape) > 1 and random.randint(0, nb) == 0:
@@ -76,7 +76,7 @@ def mutate(genes, nb, coeff):
             genes[k] += np.multiply(matrice_muta - 0.5, coeff)
 
 
-def mutate_list(list_genes, nb, coeff): 
+def mutate_list(list_genes, nb, coeff):
 
     size_list_genes = len(list_genes)
 
@@ -109,7 +109,7 @@ def pair_cross(list_genes, nb_children_from_cross):
         b1 = list_genes[k]
         b2 = list_genes[k+1]
 
-        # CROISEMENT 
+        # CROISEMENT
         # list_genes_croisement = croisement(b1, b2, self.nb_children_from_cross)
         for gene in croisement(b1, b2, nb_children_from_cross):
             to_return_list_genes.append(gene)
@@ -117,14 +117,14 @@ def pair_cross(list_genes, nb_children_from_cross):
         # MUTATIONS
         """for gene in mutate_list(list_genes_croisement, self.nb_children_from_cross / 2, 2):
                                                                 self.list_genes.append(gene)"""
-                                                                
+
 def first_cross_with_all_others(list_genes, nb_children_from_cross):
     to_return_list_genes = []
     first_gene = list_genes[0]
 
 
     for i in range(1,len(list_genes)):
-        
+
         for gene in croisement(first_gene, list_genes[i], nb_children_from_cross):
             to_return_list_genes.append(gene)
 

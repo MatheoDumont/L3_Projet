@@ -9,7 +9,7 @@ import numpy as np
 
 class Env:
 
-    def __init__(self, graphic=True, nb_robot=100):
+    def __init__(self, graphic=True, nb_robot=100, models=[]):
 
         if graphic:
             self.physicsClient = p.connect(p.GUI)
@@ -20,11 +20,23 @@ class Env:
         p.setGravity(0, 0, -10)
 
         if graphic:
-            p.setTimeStep(0.01)
+            pass
+            # on enleve le timestep car cela fausse les mesures
+            # et fais mal fonctionner les robots
+            # p.setTimeStep(0.01)
 
         # Init
-        self.nb_robot = nb_robot
+
         self.robots = []
+        start_poses = np.random.randn(len(models), 3) * 3
+        # on fixe la hauteur a 0.3
+        start_poses[:, 2] = 0.3
+        start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
+        # on charge les models dans les robots
+        for i in range(len(models)):
+            self.robots.append(Robot(start_poses[i], start_orientation, models[i]))
+
+        self.nb_robot = nb_robot
         self.load_robots()
         self.load_plane()
         self.load_collision()
@@ -71,6 +83,8 @@ class Env:
             if size_list_genes < 1:
                 robot.model.set_weights([])
             else:
+                # print(len(list_genes))
+                # print(" ", i)
                 robot.model.set_weights(list_genes[i])
 
     def computeGeneration(self, length_gen):

@@ -5,7 +5,7 @@ from genetic import *
 
 class Robot:
 
-    def __init__(self, start_pos, start_orientation):
+    def __init__(self, start_pos, start_orientation, model=None):
         self.start_pos = start_pos
         self.robotId = p.loadURDF(
             "balance.urdf", start_pos, start_orientation)
@@ -13,7 +13,10 @@ class Robot:
         self.right_join = 1
 
         self.means_distance_from_ground = 1
-        self.model = gen_NN()
+        if model != None:
+            self.model = model
+        else:
+            self.model = gen_NN()
         self.num_step = 0
         self.vitesse = 1
         self.alive = True
@@ -49,11 +52,17 @@ class Robot:
             self.moveRobot(self.vitesse, self.vitesse)
 
             if self.getDistanceFromGround() < 0.15:
+                # le bot meure
                 self.alive = False
+                # on met la vitesse a 0
+                self.moveRobot(0, 0)
+                orientation = p.getQuaternionFromEuler([0.1, 0, 0])
+                p.resetBasePositionAndOrientation(
+                    self.robotId, [0, -1000, 0] , orientation)
 
     def predict_vitesse(self):
         linear, angular = self.getLinearAndAngularSpeed()
-        
+
         predict_input = np.array(
             [linear[0], linear[1], angular[0], angular[1], self.vitesse, self.getDistanceFromGround()]).reshape(1, 6)
         self.vitesse = min(
