@@ -10,7 +10,7 @@ import base64
 
 
 class Gen_algo:
-    def __init__(self, graphic=False, nb_steps=100000, nb_start_pop=100, nb_gen=10000):
+    def __init__(self, graphic=False, nb_steps=100000, nb_start_pop=100, nb_gen=10000, load=False):
         self.nb_steps = nb_steps  # nb de move par run
         self.nb_start_pop = nb_start_pop  # nb de robot dans la pop de depart
         self.list_genes = []
@@ -18,7 +18,8 @@ class Gen_algo:
         self.nb_gen = nb_gen
         models = []
         # on recupere des models sauvegardes sur le disk
-        models.append(self.load_genes_from_disk(4))
+        if load:
+            models.append(self.load_genes_from_disk(4))
 
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop, models=models)
 
