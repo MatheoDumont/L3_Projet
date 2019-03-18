@@ -5,8 +5,8 @@ import numpy as np
 from env import Env
 from genetic import *
 
-import json
-import base64
+# import json
+# import base64
 
 
 class Gen_algo:
@@ -19,7 +19,7 @@ class Gen_algo:
         models = []
         # on recupere des models sauvegardes sur le disk
         if load:
-            models.append(self.load_genes_from_disk(4))
+            models.append(self.load_genes_from_disk(2))
 
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop, models=models)
 

@@ -13,12 +13,13 @@ class Robot:
         self.right_join = 1
 
         self.means_distance_from_ground = 1
-        if model != None:
+        if model is not None:
             self.model = model
         else:
             self.model = gen_NN()
         self.num_step = 0
-        self.vitesse = 1
+        self.speed_left = 1
+        self.speed_right = 1
         self.alive = True
         self.tick_stand_up = 0
 
@@ -49,7 +50,7 @@ class Robot:
             self.means_distance_from_ground = (self.means_distance_from_ground +
                                                self.getDistanceFromGround()) / self.num_step
             self.predict_vitesse()
-            self.moveRobot(self.vitesse, self.vitesse)
+            self.moveRobot(self.speed_left, self.speed_right)
 
             if self.getDistanceFromGround() < 0.15:
                 # le bot meure
@@ -58,15 +59,18 @@ class Robot:
                 self.moveRobot(0, 0)
                 orientation = p.getQuaternionFromEuler([0.1, 0, 0])
                 p.resetBasePositionAndOrientation(
-                    self.robotId, [0, -1000, 0] , orientation)
+                    self.robotId, [0, -1000, 0], orientation)
 
     def predict_vitesse(self):
         linear, angular = self.getLinearAndAngularSpeed()
 
         predict_input = np.array(
-            [linear[0], linear[1], angular[0], angular[1], self.vitesse, self.getDistanceFromGround()]).reshape(1, 6)
-        self.vitesse = min(
-            100, self.model.predict_on_batch([predict_input]) * 100)
+            [linear[0], linear[1], angular[0], angular[1], self.speed_left,
+                self.speed_right, self.getDistanceFromGround()]
+        ).reshape(1, 7)
+        pred_left, pred_right = self.model.predict_on_batch([predict_input])[0]
+        self.speed_left = min(100, pred_left * 100)
+        self.speed_right = min(100, pred_right * 100)
 
     def getLinearAndAngularSpeed(self):
         linear, angular = p.getBaseVelocity(self.robotId)
@@ -106,7 +110,8 @@ class Robot:
 
     def reset(self):
         self.alive = True
-        self.vitesse = 1
+        self.speed_left = 1
+        self.speed_right = 1
         self.num_step = 0
         self.means_distance_from_ground = 1
         self.tick_stand_up = 0

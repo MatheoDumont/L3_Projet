@@ -25,12 +25,12 @@ from tensorflow.python.client import device_lib
 
 def gen_NN(genes=[]):
     # Inputs
-    input = Input(shape=(6,))
+    input = Input(shape=(7,))
 
     x = Dense(10, activation='tanh')(input)
     x = Dense(10, activation='tanh')(x)
 
-    predictions = Dense(1, activation='tanh')(x)
+    predictions = Dense(2, activation='tanh')(x)
 
     model = Model(inputs=input, outputs=predictions)
 
