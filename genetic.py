@@ -39,6 +39,9 @@ def gen_NN(genes=[]):
 
     model._make_predict_function()
 
+    print("########################################################################")
+    print(model.get_weights())
+
     return model
 
 
