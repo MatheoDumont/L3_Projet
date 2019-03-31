@@ -68,7 +68,8 @@ class Robot:
             [linear[0], linear[1], angular[0], angular[1], self.speed_left,
                 self.speed_right, self.getDistanceFromGround()]
         ).reshape(1, 7)
-        pred_left, pred_right = self.model.predict_on_batch([predict_input])[0]
+       
+        pred_left, pred_right = self.model.predict_on_batch(predict_input)[0]
         self.speed_left = min(100, pred_left * 100)
         self.speed_right = min(100, pred_right * 100)
 

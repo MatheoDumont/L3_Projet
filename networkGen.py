@@ -1,4 +1,7 @@
+from keras.models import Model
+from keras.layers import Dense, Input
 import numpy as np
+import pickle
 
 
 class NetworkGen:
@@ -8,29 +11,42 @@ class NetworkGen:
         self.type = 'float32'
 
         # Hidden Layer 1
-        self.layer1 = np.random.uniform(-1, 1, (n_input, self.n_neuron)).astype(self.type)
-        self.bias1 = np.random.uniform(-1, 1, (1, self.n_neuron)).astype(self.type)
-
+        self.layer1 = np.random.uniform(-1, 1,
+                                        (n_input, self.n_neuron)).astype(self.type)
+        self.bias1 = np.random.uniform(-1, 1,
+                                       (1, self.n_neuron)).astype(self.type)
 
         # Hidden Layer 2
-        self.layer2 = np.random.uniform(-1, 1, (self.n_neuron, self.n_neuron)).astype(self.type)
+        self.layer2 = np.random.uniform(-1, 1,
+                                        (self.n_neuron, self.n_neuron)).astype(self.type)
 
-        self.bias2 = np.random.uniform(-1, 1, (1, self.n_neuron)).astype(self.type)
-
+        self.bias2 = np.random.uniform(-1, 1,
+                                       (1, self.n_neuron)).astype(self.type)
 
         # Prediction Layer
         self.predictions_layer = np.random.uniform(
             -1, 1, (self.n_neuron, n_output)).astype(self.type)
 
-        self.predictions_layer_bias = np.random.uniform(-1, 1, (1, n_output)).astype(self.type)
-
+        self.predictions_layer_bias = np.random.uniform(
+            -1, 1, (1, n_output)).astype(self.type)
 
     def get_weights(self):
-        return np.array([self.layer1, self.bias1, self.layer2, self.bias2,
-                         self.predictions_layer, self.predictions_layer_bias])
+        return np.array([self.layer1,
+                         self.bias1,
+                         self.layer2,
+                         self.bias2,
+                         self.predictions_layer,
+                         self.predictions_layer_bias])
 
     def set_weights(self, weights):
-        pass
+        self.layer1 = weights[0]
+        self.bias1 = weights[1]
+
+        self.layer2 = weights[2]
+        self.bias2 = weights[3]
+
+        self.predictions_layer = weights[4]
+        self.predictions_layer_bias = weights[5]
 
     def predict_on_batch(self, inputs):
         res1 = (inputs @ self.layer1) + self.bias1
@@ -44,8 +60,29 @@ class NetworkGen:
 
         return output
 
-    def save(self):
-        pass
+    def save_weights(self, namefile):
+        """
+        Documentation/aide utilisée pour pickle : 
+        https://stackoverflow.com/questions/35133317/numpy-save-some-arrays-at-once
+        https://docs.python.org/3/library/pickle.html
+        """
+        with open(namefile, "wb") as workingfile:
+            pickle.dump(self.get_weights(),workingfile, pickle.HIGHEST_PROTOCOL)
 
-    def load(self):
-        pass
+    def load_weights(self, namefile):
+        with open(namefile, "rb") as workingfile:
+            self.set_weights(pickle.load(workingfile))
+
+    def tf_model(self):
+        """
+        Si besoins
+        """
+        # Inputs
+        input = Input(shape=(7,))
+
+        x = Dense(10, activation='tanh')(input)
+        x = Dense(10, activation='tanh')(x)
+
+        predictions = Dense(2, activation='tanh')(x)
+
+        return Model(inputs=input, outputs=predictions)

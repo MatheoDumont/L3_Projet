@@ -10,6 +10,7 @@ import random
 from keras.models import Model
 from keras.layers import Dense, Input
 import math
+from networkGen import NetworkGen
 """
 import keras.backend as K
 import tensorflow
@@ -24,23 +25,22 @@ from tensorflow.python.client import device_lib
 
 
 def gen_NN(genes=[]):
-    # Inputs
-    input = Input(shape=(7,))
+    # # Inputs
+    # input = Input(shape=(7,))
 
-    x = Dense(10, activation='tanh')(input)
-    x = Dense(10, activation='tanh')(x)
+    # x = Dense(10, activation='tanh')(input)
+    # x = Dense(10, activation='tanh')(x)
 
-    predictions = Dense(2, activation='tanh')(x)
+    # predictions = Dense(2, activation='tanh')(x)
 
-    model = Model(inputs=input, outputs=predictions)
+    # model = Model(inputs=input, outputs=predictions)
 
-    if len(genes) > 0:
-        model.set_weights(genes)
+    # if len(genes) > 0:
+    #     model.set_weights(genes)
 
-    model._make_predict_function()
+    # model._make_predict_function()
 
-    print("########################################################################")
-    print(model.get_weights())
+    model = NetworkGen(7, 2)
 
     return model
 

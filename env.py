@@ -83,9 +83,9 @@ class Env:
             if size_list_genes < 1:
                 robot.model.set_weights([])
             else:
-                # print(len(list_genes))
-                # print(" ", i)
                 robot.model.set_weights(list_genes[i])
+               
+                
 
     def computeGeneration(self, length_gen):
         for i in range(length_gen):

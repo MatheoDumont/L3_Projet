@@ -68,6 +68,7 @@ class Gen_algo:
             print("Resultat des boss: ", list_fitness_overall[:self.nb_boss])
 
             if self.best_fitness < list_robots[0].computeFitness():
+                print("############### Sauvegarde best Bot ##################")
                 self.save_to_disk(list_robots[0].model)
                 self.best_fitness = list_robots[0].computeFitness()
 
@@ -86,7 +87,7 @@ class Gen_algo:
                     new_list_genes.append(list_robots[i].model.get_weights())
 
             self.list_genes = first_cross_with_all_others(new_list_genes, self.nb_children_from_each_cross)
-            print(len(self.list_genes))
+            
             self.list_genes = self.list_genes[:self.nb_to_cross]
 
             # On ajoute directement les meilleurs bots de cette génération à la suivante
@@ -99,6 +100,7 @@ class Gen_algo:
         self.env.disconnect()
 
     def save_to_disk(self, model):
+
         # sauvegarde le model dans le fichier best1.h5
         return model.save_weights('best1.h5')
 
