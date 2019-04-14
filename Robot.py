@@ -25,10 +25,8 @@ class Robot:
         self.mean_diff_vitesse = 0
 
         linear, angular = self.getLinearAndAngularSpeed()
-        start_input = np.array(
-            [linear[0], linear[1], angular[0], angular[1], self.speed_left,
-                self.speed_right, self.getDistanceFromGround()]
-        )
+        # creation du tableau contenant les inputs des predictions passees / sorte de NN recurrent
+        start_input = np.array([linear[0], linear[1], angular[0], angular[1], self.speed_left, self.speed_right, self.getDistanceFromGround()])
         start_input = start_input.reshape(1, start_input.shape[0])
 
         self.prec_input = [start_input, start_input]
@@ -60,8 +58,11 @@ class Robot:
             self.means_distance_from_ground = (self.means_distance_from_ground * (self.num_step-1) + self.getDistanceFromGround()) / self.num_step
             #self.means_distance_from_ground = (self.means_distance_from_ground +
             #                                   self.getDistanceFromGround()) / self.num_step
+
+            # calcul de la moyenne de la diff entre les vitesses des roues / agit comme une penalite
             diff_vitesse = abs(self.speed_right - self.speed_left)
             self.mean_diff_vitesse = (self.mean_diff_vitesse * (self.num_step-1) + diff_vitesse) / self.num_step
+
             self.predict_vitesse()
             self.moveRobot(self.speed_left, self.speed_right)
 
@@ -77,23 +78,23 @@ class Robot:
     def predict_vitesse(self):
         linear, angular = self.getLinearAndAngularSpeed()
 
+        # inputs avec les datas actuelles du robot
         predict_input = np.array(
             [linear[0], linear[1], angular[0], angular[1], self.speed_left,
                 self.speed_right, self.getDistanceFromGround()]
         )
         predict_input = predict_input.reshape(1, predict_input.shape[0])
+
+        # on ajoute les precedents inputs
         input = np.hstack((predict_input, self.prec_input[1], self.prec_input[0]))
 
+        # update du tableau pour reinjecter l'inputs actuelle dans la prochaine predict
         self.prec_input[0] = self.prec_input[1]
-
         self.prec_input[1] = predict_input
-
-        #print(input.shape)
 
         pred_left, pred_right = self.model.predict_on_batch(input)[0]
         self.speed_left = min(100, pred_left * 100)
         self.speed_right = min(100, pred_right * 100)
-        #print(self.speed_right)
 
     def getLinearAndAngularSpeed(self):
         linear, angular = p.getBaseVelocity(self.robotId)
@@ -127,7 +128,9 @@ class Robot:
         25 % pour "means_distance_from_ground"
         25 % pour la distance parcourue depuis le départ de la run pour le robot
         """
-        #print(self.means_distance_from_ground)
+
+        # mean_diff_vittesse agit comme une penalite, on peut ajuster son importance
+        # la distance moyenne au sol est "inverse" puis mise au carre pour accentuer l'effet positif ou negatif d'etre droit ou penche
         return (self.tick_stand_up) * (1 - self.means_distance_from_ground)**2 - (self.mean_diff_vitesse / 10)
 
     def reset(self):
@@ -136,5 +139,5 @@ class Robot:
         self.speed_right = 1
         self.num_step = 0
         self.means_distance_from_ground = 1
-        self.tick_stand_up = 0
         self.mean_diff_vitesse = 1
+        self.tick_stand_up = 0

@@ -86,7 +86,7 @@ class Gen_algo:
                 for i in range(0, self.nb_to_cross - len(new_list_genes)):
                     new_list_genes.append(list_robots[i].model.get_weights())
 
-            self.list_genes = mutate_list(first_cross_with_all_others(new_list_genes, self.nb_children_from_each_cross), 2, 1)
+            self.list_genes = first_cross_with_all_others(new_list_genes, self.nb_children_from_each_cross)
 
             self.list_genes = self.list_genes[:self.nb_to_cross]
 
