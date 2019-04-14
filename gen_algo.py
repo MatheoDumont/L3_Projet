@@ -19,7 +19,7 @@ class Gen_algo:
         models = []
         # on recupere des models sauvegardes sur le disk
         if load:
-            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(5))
 
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop, models=models)
 
@@ -86,8 +86,8 @@ class Gen_algo:
                 for i in range(0, self.nb_to_cross - len(new_list_genes)):
                     new_list_genes.append(list_robots[i].model.get_weights())
 
-            self.list_genes = first_cross_with_all_others(new_list_genes, self.nb_children_from_each_cross)
-            
+            self.list_genes = mutate_list(first_cross_with_all_others(new_list_genes, self.nb_children_from_each_cross), 2, 1)
+
             self.list_genes = self.list_genes[:self.nb_to_cross]
 
             # On ajoute directement les meilleurs bots de cette génération à la suivante
@@ -128,6 +128,9 @@ class Gen_algo:
         if choice == 4:
             # charge un model fitness 50
             file = "best_5000.h5"
+        if choice == 5:
+            # charge un model fitness 50
+            file = "best2_300.h5"
 
         model.load_weights(file)
         return model

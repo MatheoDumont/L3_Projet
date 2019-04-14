@@ -7,7 +7,7 @@ import pickle
 class NetworkGen:
 
     def __init__(self, n_input, n_output):
-        self.n_neuron = 10
+        self.n_neuron = 21
         self.type = 'float32'
 
         # Hidden Layer 1
@@ -23,6 +23,12 @@ class NetworkGen:
         self.bias2 = np.random.uniform(-1, 1,
                                        (1, self.n_neuron)).astype(self.type)
 
+        # Hidden Layer 3
+        self.layer3 = np.random.uniform(-1, 1,
+                                        (self.n_neuron, self.n_neuron)).astype(self.type)
+
+        self.bias3 = np.random.uniform(-1, 1,
+                                       (1, self.n_neuron)).astype(self.type)
         # Prediction Layer
         self.predictions_layer = np.random.uniform(
             -1, 1, (self.n_neuron, n_output)).astype(self.type)
@@ -35,6 +41,8 @@ class NetworkGen:
                          self.bias1,
                          self.layer2,
                          self.bias2,
+                         self.layer3,
+                         self.bias3,
                          self.predictions_layer,
                          self.predictions_layer_bias])
 
@@ -45,8 +53,11 @@ class NetworkGen:
         self.layer2 = weights[2]
         self.bias2 = weights[3]
 
-        self.predictions_layer = weights[4]
-        self.predictions_layer_bias = weights[5]
+        self.layer3 = weights[4]
+        self.bias3 = weights[5]
+
+        self.predictions_layer = weights[6]
+        self.predictions_layer_bias = weights[7]
 
     def predict_on_batch(self, inputs):
         res1 = (inputs @ self.layer1) + self.bias1
@@ -55,8 +66,11 @@ class NetworkGen:
         res2 = (act1 @ self.layer2) + self.bias2
         act2 = np.tanh(res2)
 
-        res3 = (act2 @ self.predictions_layer) + self.predictions_layer_bias
-        output = np.tanh(res3)
+        res3 = (act2 @ self.layer3) + self.bias3
+        act3 = np.tanh(res3)
+
+        res4 = (act3 @ self.predictions_layer) + self.predictions_layer_bias
+        output = np.tanh(res4)
 
         return output
 
