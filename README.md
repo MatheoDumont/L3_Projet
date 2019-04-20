@@ -8,9 +8,9 @@ Pour l'installation, vous aurez besoins de plusieurs packages, vous pouvez les i
 #### Avec windows
 
 Pour l'installation de Pybullet, vous risquez d'avoir besoin d'installer Visual Studio.
-Pybullet necessite certains composants installés avec.
+Pybullet nécessite certains composants installés avec.
 
-Vous devez lancer la commande en étant administrateur :
+Vous devez lancer la commande en tant qu'administrateur :
 ```bash
 pip install pybullet numpy
 ```
@@ -36,7 +36,7 @@ git clone https://github.com/MatheoDumont/L3_Projet.git
 
 Assurez vous d'être dans le bon répertoire :
 ```zsh
-cd L3_projet
+cd /votre/chemin/L3_projet
 ```
 
 Utiliser cette commande pour lancer lancer l'algo:
@@ -50,4 +50,4 @@ python main.py [1] [2] [3]
 Pour utiliser l'algorithme déjà entrainé, il faut donc mettre le 3ème argument à ```True```.
 
 Pour sauvegarder et manipuler plus d'un réseau de neurones à la fois, 
-ça se passe dans gen_algo.py avec les méthodes ```load_genes_from_disk``` et ```save_to_disk```
+ça se passe dans gen_algo.py avec les méthodes ```load_genes_from_disk``` et ```save_to_disk``` que vous devrez manipuler.
