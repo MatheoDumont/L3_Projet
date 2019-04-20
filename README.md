@@ -11,7 +11,7 @@ Pour l'installation de pybulle, vous risquez d'avoir besoin d'installer Visual S
 Pybullet necessite certains composants installés avec.
 
 Vous devez lancer la commande en étant administrateur :
-```zsh
+```bash
 pip install pybullet numpy
 ```
 
@@ -24,7 +24,7 @@ git clone https://github.com/MatheoDumont/L3_Projet.git
 #### Pour Linux
 
 ```bash
-sudo pip3 install pybullet numpy
+pip3 install -U pybullet numpy
 ```
 
 ```bash
@@ -45,4 +45,4 @@ python main.py [1] [2] [3]
 ```
 1. boolean : Affichage graphique : True, sinon ligne de commande
 2. integer : Nombre d'individus pour la simulation, nous vous conseillons 10, autrement cela risque de ne pas marcher.
-3. boolean : Charger une sauvegarde d'un réseau de neurones antérieur.
+3. boolean : Charger un réseau de neurones antérieur.
