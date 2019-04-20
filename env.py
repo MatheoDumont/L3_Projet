@@ -48,7 +48,7 @@ class Env:
         # on fixe la hauteur a 0.3
         start_poses[:, 2] = 0.3
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
-
+        #print("angle: ", Robot(np.array([0, 0, 0]), start_orientation).angle([1, 0, 0], [0, 1, 1]))
         if reset:
             for i in range(self.nb_robot):
                 self.robots[i].reset()

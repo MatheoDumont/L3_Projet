@@ -24,7 +24,13 @@ class Robot:
         self.means_distance_from_ground = 1
         self.mean_diff_vitesse = 1
         self.mean_diff_ori = 1
-        self.prec_ori = start_orientation
+        ori = p.getQuaternionFromEuler(start_orientation)
+        list_ori = []
+        for i in range(0, 100):
+            list_ori.append(start_orientation)
+
+        self.prec_ori = np.array(list_ori)
+        print(self.prec_ori)
 
         linear, angular = self.getLinearAndAngularSpeed()
         # creation du tableau contenant les inputs des predictions passees / sorte de NN recurrent
@@ -68,10 +74,14 @@ class Robot:
             self.predict_vitesse()
             self.moveRobot(self.speed_left, self.speed_right)
             ori, _ = p.getBasePositionAndOrientation(self.robotId)
-            diff_ori = self.angle(ori, self.prec_ori)
-            print(diff_ori)
-            self.mean_diff_ori = (self.mean_diff_ori * (self.num_step-1) + diff_ori) / self.num_step
-            self.prec_ori = ori
+            print(self.prec_ori[0])
+            diff_ori = self.angle(ori, self.prec_ori[0]) * 100
+            #print(diff_ori)
+            self.mean_diff_ori = (self.mean_diff_ori * (self.num_step-1) + diff_ori**2) / self.num_step
+
+            for i in range(0, len(self.prec_ori)-2):
+                self.prec_ori[i] = self.prec_ori[i+1]
+            self.prec_ori[len(self.prec_ori)-1] = ori
 
             if self.getDistanceFromGround() < 0.15:
                 # le bot meure
@@ -117,7 +127,12 @@ class Robot:
 
     def angle(self, v1, v2):
         # calcul d'angle entre les 2 vecteurs sur le plan horizontal
-        return math.acos( (v1[0]*v2[0] + v1[2]*v2[2]) / (math.hypot(v1[0], v1[2]) * math.hypot(v2[0], v2[2]) ) )
+        print("==:", v1)
+        print(v2)
+        #produit_scalaire = v1[0]*v2[0] + v1[2]*v2[2]
+        #n1 = math.hypot(v1[0], v1[2])
+        #n2 = math.hypot(v2[0], v2[2])
+        return math.acos( (v1[0]*v2[0] + v1[2]*v2[2]) / (math.hypot(v1[0], v1[2]) * math.hypot(v2[0], v2[2])) )
 
 
     def getAngleWithGround(self):
@@ -143,7 +158,8 @@ class Robot:
 
         # mean_diff_vittesse agit comme une penalite, on peut ajuster son importance
         # la distance moyenne au sol est "inverse" puis mise au carre pour accentuer l'effet positif ou negatif d'etre droit ou penche
-        return (self.tick_stand_up) * (1 - self.means_distance_from_ground)**2 - (self.mean_diff_vitesse / 10)
+        print(self.mean_diff_ori * 10)
+        return (self.tick_stand_up) * (1 - self.means_distance_from_ground)**2 - (self.mean_diff_vitesse / 10) - self.mean_diff_ori
 
     def reset(self):
         self.alive = True
