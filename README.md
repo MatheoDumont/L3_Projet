@@ -5,7 +5,7 @@ Nous utilisons comme moteur physique Pybullet.
 ## Installation :
 Pour l'installation, vous aurez besoins de plusieurs packages, vous pouvez les installer en utilisant :
 
-#### Avec windows
+#### Avec Windows
 
 Pour l'installation de Pybullet, vous risquez d'avoir besoin d'installer Visual Studio.
 Pybullet nécessite certains composants installés avec.
