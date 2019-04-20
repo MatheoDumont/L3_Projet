@@ -12,7 +12,6 @@ class Robot:
         self.left_join = 0
         self.right_join = 1
 
-        self.means_distance_from_ground = 1
         if model is not None:
             self.model = model
         else:
@@ -22,7 +21,10 @@ class Robot:
         self.speed_right = 1
         self.alive = True
         self.tick_stand_up = 0
-        self.mean_diff_vitesse = 0
+        self.means_distance_from_ground = 1
+        self.mean_diff_vitesse = 1
+        self.mean_diff_ori = 1
+        self.prec_ori = start_orientation
 
         linear, angular = self.getLinearAndAngularSpeed()
         # creation du tableau contenant les inputs des predictions passees / sorte de NN recurrent
@@ -65,6 +67,11 @@ class Robot:
 
             self.predict_vitesse()
             self.moveRobot(self.speed_left, self.speed_right)
+            ori, _ = p.getBasePositionAndOrientation(self.robotId)
+            diff_ori = self.angle(ori, self.prec_ori)
+            print(diff_ori)
+            self.mean_diff_ori = (self.mean_diff_ori * (self.num_step-1) + diff_ori) / self.num_step
+            self.prec_ori = ori
 
             if self.getDistanceFromGround() < 0.15:
                 # le bot meure
@@ -86,13 +93,13 @@ class Robot:
         predict_input = predict_input.reshape(1, predict_input.shape[0])
 
         # on ajoute les precedents inputs
-        input = np.hstack((predict_input, self.prec_input[1], self.prec_input[0]))
+        input = np.hstack((predict_input, self.prec_input[1]))
 
         # update du tableau pour reinjecter l'inputs actuelle dans la prochaine predict
         self.prec_input[0] = self.prec_input[1]
         self.prec_input[1] = predict_input
 
-        pred_left, pred_right = self.model.predict_on_batch(input)[0]
+        pred_left, pred_right = self.model.predict_on_batch(predict_input)[0]
         self.speed_left = min(100, pred_left * 100)
         self.speed_right = min(100, pred_right * 100)
 
@@ -107,6 +114,11 @@ class Robot:
         # x z y, le y nous indique la proximité du sol et le centre du robot
         cubePos, cubeOrn = p.getBasePositionAndOrientation(self.robotId)
         return cubePos[2]  # y, si < 0.15, on peut estimer qu'il est horizontal
+
+    def angle(self, v1, v2):
+        # calcul d'angle entre les 2 vecteurs sur le plan horizontal
+        return math.acos( (v1[0]*v2[0] + v1[2]*v2[2]) / (math.hypot(v1[0], v1[2]) * math.hypot(v2[0], v2[2]) ) )
+
 
     def getAngleWithGround(self):
         pass
@@ -140,4 +152,5 @@ class Robot:
         self.num_step = 0
         self.means_distance_from_ground = 1
         self.mean_diff_vitesse = 1
+        self.mean_diff_ori = 1
         self.tick_stand_up = 0

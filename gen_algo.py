@@ -19,7 +19,7 @@ class Gen_algo:
         models = []
         # on recupere des models sauvegardes sur le disk
         if load:
-            models.append(self.load_genes_from_disk(5))
+            models.append(self.load_genes_from_disk(6))
 
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop, models=models)
 
@@ -131,6 +131,9 @@ class Gen_algo:
         if choice == 5:
             # charge un model fitness 50
             file = "best2_300.h5"
+        if choice == 6:
+            # charge un model fitness 50
+            file = "best2_1500.h5"
 
         model.load_weights(file)
         return model

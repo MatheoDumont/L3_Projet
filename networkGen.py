@@ -7,7 +7,7 @@ import pickle
 class NetworkGen:
 
     def __init__(self, n_input, n_output):
-        self.n_neuron = 21
+        self.n_neuron = 10
         self.type = 'float32'
 
         # Hidden Layer 1
