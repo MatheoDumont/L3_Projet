@@ -51,3 +51,11 @@ Pour utiliser l'algorithme déjà entrainé, il faut donc mettre le 3ème argume
 
 Pour sauvegarder et manipuler plus d'un réseau de neurones à la fois, 
 ça se passe dans gen_algo.py avec les méthodes ```load_genes_from_disk``` et ```save_to_disk``` que vous devrez manipuler.
+
+## Sources
+
+Ce [post](https://backyardrobotics.eu/2017/11/27/build-a-balancing-bot-with-openai-gym-pt-i-setting-up/) de backyardrobotics au début pour débuter avec Pybullet ainsi que son [dépot](https://github.com/yconst/balance-bot).
+
+
+Nous avons utilisé l’asset des roues (wheel.obj) de ce [dépot](https://github.com/yconst/balance-bot-ne/tree/master/balance_bot_ne) pour notre balance bot.
+
