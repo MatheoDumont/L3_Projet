@@ -1,12 +1,7 @@
-# import time
 import numpy as np
-# import keras
 
 from env import Env
 from genetic import *
-
-# import json
-# import base64
 
 
 class Gen_algo:
@@ -19,6 +14,14 @@ class Gen_algo:
         models = []
         # on recupere des models sauvegardes sur le disk
         if load:
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
             models.append(self.load_genes_from_disk(2))
             models.append(self.load_genes_from_disk(2))
 
@@ -43,8 +46,6 @@ class Gen_algo:
             print(" ")
             print("======================================================")
             print("Generation: ", num_gen)
-
-            # keras.backend.clear_session()
 
             # pas besoins de load_genes la premiere fois, alors que les robots
             # ont déjà été initialisés

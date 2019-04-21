@@ -1,10 +1,7 @@
 import pybullet as p
 import pybullet_data
-# import time
 from Robot import Robot
 import numpy as np
-
-# import keras
 
 
 class Env:

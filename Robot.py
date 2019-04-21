@@ -94,11 +94,10 @@ class Robot:
         linear, angular = self.getLinearAndAngularSpeed()
         _, ori = p.getBasePositionAndOrientation(self.robotId)
         ori = p.getEulerFromQuaternion(ori)
-        
+
         # inputs avec les datas actuelles du robot
         predict_input = np.array(
             [linear[0], linear[1], angular[0], angular[1], self.speed_left, self.getDistanceFromGround()]
-            # [linear[0], linear[1], linear[2], angular[0], angular[1], angular[2], self.speed_left, self.speed_right, ori[0], ori[1], ori[2]]
         )
         predict_input = predict_input.reshape(1, predict_input.shape[0])
 
