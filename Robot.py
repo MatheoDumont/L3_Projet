@@ -26,12 +26,14 @@ class Robot:
         self.mean_diff_vitesse = 1
         self.mean_diff_ori = 1
 
+        """ Pas utilise car le robot ne controle qu'une roue
         list_ori = []
         star_ori = p.getEulerFromQuaternion(start_orientation)
         for i in range(0, 10):
             list_ori.append(star_ori)
 
         self.prec_ori = np.array(list_ori)
+        """
 
     def moveRobot(self, left_speed, right_speed):
         """
@@ -59,6 +61,7 @@ class Robot:
             self.tick_stand_up += 1
             self.means_distance_from_ground = (self.means_distance_from_ground * (self.num_step-1) + self.getDistanceFromGround()) / self.num_step
 
+            """ Pas utilise car le robot ne controle qu'une roue
             # calcul de la moyenne de la diff entre les vitesses des roues / agit comme une penalite
             diff_vitesse = abs(self.speed_right - self.speed_left)
             self.mean_diff_vitesse = (self.mean_diff_vitesse * (self.num_step-1) + diff_vitesse) / self.num_step
@@ -73,6 +76,7 @@ class Robot:
             for i in range(0, len(self.prec_ori)-2):
                 self.prec_ori[i] = self.prec_ori[i+1]
             self.prec_ori[len(self.prec_ori)-1] = ori
+            """
 
             # effectue la prediction de la vitesse des 2 roues
             self.predict_vitesse()
@@ -92,8 +96,11 @@ class Robot:
 
     def predict_vitesse(self):
         linear, angular = self.getLinearAndAngularSpeed()
+
+        """ Pas utilise car le robot ne controle qu'une roue
         _, ori = p.getBasePositionAndOrientation(self.robotId)
         ori = p.getEulerFromQuaternion(ori)
+        """
 
         # inputs avec les datas actuelles du robot
         predict_input = np.array(
