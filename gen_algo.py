@@ -21,8 +21,6 @@ class Gen_algo:
         if load:
             models.append(self.load_genes_from_disk(2))
             models.append(self.load_genes_from_disk(2))
-            models.append(self.load_genes_from_disk(2))
-            models.append(self.load_genes_from_disk(2))
 
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop, models=models)
 
@@ -111,7 +109,7 @@ class Gen_algo:
             # est ensuite remplace par le best de la session en cours
             file = "best1.h5"
         elif choice == 2:
-            file = "model_1.h5"
+            file = "tient_debout.h5"
 
         model.load_weights(file)
         return model

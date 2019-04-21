@@ -40,7 +40,7 @@ def gen_NN(genes=[]):
 
     # model._make_predict_function()
 
-    model = NetworkGen(7, 1)
+    model = NetworkGen(6, 1)
 
     return model
 

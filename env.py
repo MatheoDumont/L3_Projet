@@ -25,7 +25,7 @@ class Env:
 
         # on fixe la hauteur a 0.3
         start_poses[:, 2] = 0.3
-        start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
+        start_orientation = p.getQuaternionFromEuler([0, 0, 0])
 
         # on charge les models dans les robots
         for i in range(len(models)):
@@ -42,7 +42,7 @@ class Env:
 
         # on fixe la hauteur a 0.3
         start_poses[:, 2] = 0.3
-        start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
+        start_orientation = p.getQuaternionFromEuler([0, 0, 0])
 
         if reset:
             # on reset juste la position des robots ainsi que les attribues comme la fitness, etc.
