@@ -19,19 +19,14 @@ class Env:
         p.setAdditionalSearchPath(pybullet_data.getDataPath())
         p.setGravity(0, 0, -10)
 
-        if graphic:
-            pass
-            # on enleve le timestep car cela fausse les mesures
-            # et fais mal fonctionner les robots
-            # p.setTimeStep(0.01)
-
-        # Init
-
         self.robots = []
-        start_poses = np.random.randn(len(models), 3) * 3
+        # assignation des positions des robots aleatoirement
+        start_poses = np.random.randn(len(models), 3) * 4
+
         # on fixe la hauteur a 0.3
         start_poses[:, 2] = 0.3
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
+
         # on charge les models dans les robots
         for i in range(len(models)):
             self.robots.append(Robot(start_poses[i], start_orientation, models[i]))
@@ -43,20 +38,21 @@ class Env:
 
     def load_robots(self, reset=False):
         # list des positions initiales des robots qui seront aleatoires
-        start_poses = np.random.randn(self.nb_robot, 3) * 3
+        start_poses = np.random.randn(self.nb_robot, 3) * 4
 
         # on fixe la hauteur a 0.3
         start_poses[:, 2] = 0.3
         start_orientation = p.getQuaternionFromEuler([0.1, 0, 0])
-        #print("angle: ", Robot(np.array([0, 0, 0]), start_orientation).angle([1, 0, 0], [0, 1, 1]))
+
         if reset:
+            # on reset juste la position des robots ainsi que les attribues comme la fitness, etc.
             for i in range(self.nb_robot):
                 self.robots[i].reset()
                 p.resetBasePositionAndOrientation(
                     self.robots[i].robotId, start_poses[i], start_orientation)
 
-        elif not reset:
-            for i in range(self.nb_robot):
+        elif not reset:  # on rajoute les robots dans la simulation
+            for i in range(self.nb_robot - len(self.robots)):
                 self.robots.append(Robot(start_poses[i], start_orientation))
 
     def load_collision(self):
@@ -72,9 +68,11 @@ class Env:
                 self.robots[i].robotId, self.planeId, -1, -1, 1)
 
     def load_plane(self):
+        # chargement du plateau
         self.planeId = p.loadURDF("plane.urdf")
 
     def load_genes(self, list_genes):
+        # chargement des genes dans les robots pour faire les predictions
         size_list_genes = len(list_genes)
 
         for i in range(self.nb_robot):
@@ -82,19 +80,19 @@ class Env:
 
             if size_list_genes < 1:
                 robot.model.set_weights([])
-            else: 
-                #print(len(list_genes[i]))
+            else:
                 robot.model.set_weights(list_genes[i])
 
     def computeGeneration(self, length_gen):
         for i in range(length_gen):
-            if self.step() < 1:
+            if self.step() < 1:  # tourne tant qu'il y a des robots en vie
                 break
 
     def step(self):
         """
         Pour calculer une étape pour le moteur et l'algo
         on calcule le step de chaque robot
+        Return le nombre de robots encore en vie
         """
         nb_alive = self.nb_robot
 
@@ -106,13 +104,6 @@ class Env:
         p.stepSimulation(self.physicsClient)
 
         return nb_alive
-
-    def save(self):
-        """
-                Save le résultat
-                :return: jesaispas
-                """
-        pass
 
     def disconnect(self):
         p.disconnect()

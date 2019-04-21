@@ -1,5 +1,5 @@
-from keras.models import Model
-from keras.layers import Dense, Input
+# from keras.models import Model
+# from keras.layers import Dense, Input
 import numpy as np
 import pickle
 
@@ -24,11 +24,11 @@ class NetworkGen:
                                        (1, self.n_neuron)).astype(self.type)
 
         # Hidden Layer 3
-        self.layer3 = np.random.uniform(-1, 1,
-                                        (self.n_neuron, self.n_neuron)).astype(self.type)
+        # self.layer3 = np.random.uniform(-1, 1,
+        #                                 (self.n_neuron, self.n_neuron)).astype(self.type)
 
-        self.bias3 = np.random.uniform(-1, 1,
-                                       (1, self.n_neuron)).astype(self.type)
+        # self.bias3 = np.random.uniform(-1, 1,
+        #                                (1, self.n_neuron)).astype(self.type)
         # Prediction Layer
         self.predictions_layer = np.random.uniform(
             -1, 1, (self.n_neuron, n_output)).astype(self.type)
@@ -41,8 +41,8 @@ class NetworkGen:
                          self.bias1,
                          self.layer2,
                          self.bias2,
-                         self.layer3,
-                         self.bias3,
+                         # self.layer3,
+                         # self.bias3,
                          self.predictions_layer,
                          self.predictions_layer_bias])
 
@@ -53,11 +53,11 @@ class NetworkGen:
         self.layer2 = weights[2]
         self.bias2 = weights[3]
 
-        self.layer3 = weights[4]
-        self.bias3 = weights[5]
+        # self.layer3 = weights[4]
+        # self.bias3 = weights[5]
 
-        self.predictions_layer = weights[6]
-        self.predictions_layer_bias = weights[7]
+        self.predictions_layer = weights[4]
+        self.predictions_layer_bias = weights[5]
 
     def predict_on_batch(self, inputs):
         res1 = (inputs @ self.layer1) + self.bias1
@@ -66,37 +66,23 @@ class NetworkGen:
         res2 = (act1 @ self.layer2) + self.bias2
         act2 = np.tanh(res2)
 
-        res3 = (act2 @ self.layer3) + self.bias3
-        act3 = np.tanh(res3)
+        # res3 = (act2 @ self.layer3) + self.bias3
+        # act3 = np.tanh(res3)
 
-        res4 = (act3 @ self.predictions_layer) + self.predictions_layer_bias
+        res4 = (act2 @ self.predictions_layer) + self.predictions_layer_bias
         output = np.tanh(res4)
 
         return output
 
     def save_weights(self, namefile):
         """
-        Documentation/aide utilisée pour pickle : 
+        Documentation/aide utilisée pour pickle :
         https://stackoverflow.com/questions/35133317/numpy-save-some-arrays-at-once
         https://docs.python.org/3/library/pickle.html
         """
         with open(namefile, "wb") as workingfile:
-            pickle.dump(self.get_weights(),workingfile, pickle.HIGHEST_PROTOCOL)
+            pickle.dump(self.get_weights(), workingfile, pickle.HIGHEST_PROTOCOL)
 
     def load_weights(self, namefile):
         with open(namefile, "rb") as workingfile:
             self.set_weights(pickle.load(workingfile))
-
-    def tf_model(self):
-        """
-        Si besoins
-        """
-        # Inputs
-        input = Input(shape=(7,))
-
-        x = Dense(10, activation='tanh')(input)
-        x = Dense(10, activation='tanh')(x)
-
-        predictions = Dense(2, activation='tanh')(x)
-
-        return Model(inputs=input, outputs=predictions)

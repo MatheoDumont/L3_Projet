@@ -7,8 +7,8 @@ import numpy as np
 import random
 # import pandas as pd
 # from tqdm import tqdm
-from keras.models import Model
-from keras.layers import Dense, Input
+# from keras.models import Model
+# from keras.layers import Dense, Input
 import math
 from networkGen import NetworkGen
 """
@@ -40,7 +40,7 @@ def gen_NN(genes=[]):
 
     # model._make_predict_function()
 
-    model = NetworkGen(7, 2)
+    model = NetworkGen(7, 1)
 
     return model
 
@@ -93,15 +93,16 @@ def mutate_list(list_genes, nb, coeff):
     return list_genes
 
 
-def selection(list_genes, max): # max: le nombre maximale de bot qui seront selectionne
+def selection(list_genes, max):  # max: le nombre maximale de bot qui seront selectionne
     new_list_genes = []
-    new_list_genes.append(list_genes[0]) # on selectionne le premier notament car log(0) existe pas
+    new_list_genes.append(list_genes[0])  # on selectionne le premier notament car log(0) existe pas
 
     for i in range(1, len(list_genes)):
         # les bots sont tries par fitness, plus le bot courant est loin dans la liste moins il a de chances d'etre selectionne
-        if not len(new_list_genes) > max  and random.uniform(0, math.log(i)) <= 1:
+        if not len(new_list_genes) > max and random.uniform(0, math.log(i)) <= 1:
             new_list_genes.append(list_genes[i])
     return new_list_genes
+
 
 def pair_cross(list_genes, nb_children_from_cross):
     # POUR LES PAIRS DE BOSS(meilleurs robots)
@@ -121,12 +122,12 @@ def pair_cross(list_genes, nb_children_from_cross):
         """for gene in mutate_list(list_genes_croisement, self.nb_children_from_cross / 2, 2):
                                                                 self.list_genes.append(gene)"""
 
+
 def first_cross_with_all_others(list_genes, nb_children_from_cross):
     to_return_list_genes = []
     first_gene = list_genes[0]
 
-
-    for i in range(1,len(list_genes)):
+    for i in range(1, len(list_genes)):
 
         for gene in croisement(first_gene, list_genes[i], nb_children_from_cross):
             to_return_list_genes.append(gene)

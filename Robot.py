@@ -1,4 +1,5 @@
 import pybullet as p
+import numpy as np
 
 from genetic import *
 
@@ -24,20 +25,13 @@ class Robot:
         self.means_distance_from_ground = 1
         self.mean_diff_vitesse = 1
         self.mean_diff_ori = 1
-        ori = p.getQuaternionFromEuler(start_orientation)
+
         list_ori = []
-        for i in range(0, 100):
-            list_ori.append(start_orientation)
+        star_ori = p.getEulerFromQuaternion(start_orientation)
+        for i in range(0, 10):
+            list_ori.append(star_ori)
 
         self.prec_ori = np.array(list_ori)
-        print(self.prec_ori)
-
-        linear, angular = self.getLinearAndAngularSpeed()
-        # creation du tableau contenant les inputs des predictions passees / sorte de NN recurrent
-        start_input = np.array([linear[0], linear[1], angular[0], angular[1], self.speed_left, self.speed_right, self.getDistanceFromGround()])
-        start_input = start_input.reshape(1, start_input.shape[0])
-
-        self.prec_input = [start_input, start_input]
 
     def moveRobot(self, left_speed, right_speed):
         """
@@ -64,31 +58,34 @@ class Robot:
         if self.alive:
             self.tick_stand_up += 1
             self.means_distance_from_ground = (self.means_distance_from_ground * (self.num_step-1) + self.getDistanceFromGround()) / self.num_step
-            #self.means_distance_from_ground = (self.means_distance_from_ground +
-            #                                   self.getDistanceFromGround()) / self.num_step
 
             # calcul de la moyenne de la diff entre les vitesses des roues / agit comme une penalite
             diff_vitesse = abs(self.speed_right - self.speed_left)
             self.mean_diff_vitesse = (self.mean_diff_vitesse * (self.num_step-1) + diff_vitesse) / self.num_step
 
-            self.predict_vitesse()
-            self.moveRobot(self.speed_left, self.speed_right)
+            # calcul de la difference entre l'orientation actuelle du robot sur le plan horizonal et l'orientation du robot dans le passe
             ori, _ = p.getBasePositionAndOrientation(self.robotId)
-            print(self.prec_ori[0])
             diff_ori = self.angle(ori, self.prec_ori[0]) * 100
-            #print(diff_ori)
+
             self.mean_diff_ori = (self.mean_diff_ori * (self.num_step-1) + diff_ori**2) / self.num_step
 
             for i in range(0, len(self.prec_ori)-2):
                 self.prec_ori[i] = self.prec_ori[i+1]
             self.prec_ori[len(self.prec_ori)-1] = ori
 
+            # effectue la prediction de la vitesse des 2 roues
+            self.predict_vitesse()
+            self.moveRobot(self.speed_left, self.speed_right)
+
+            # si le bot est trop penche on considere qu'il est mort et on le teleporte en dehors du plateau
             if self.getDistanceFromGround() < 0.15:
-                # le bot meure
                 self.alive = False
+
                 # on met la vitesse a 0
                 self.moveRobot(0, 0)
                 orientation = p.getQuaternionFromEuler([0.1, 0, 0])
+
+                # on le teleporte en dehors du plateau
                 p.resetBasePositionAndOrientation(
                     self.robotId, [0, -1000, 0], orientation)
 
@@ -97,21 +94,13 @@ class Robot:
 
         # inputs avec les datas actuelles du robot
         predict_input = np.array(
-            [linear[0], linear[1], angular[0], angular[1], self.speed_left,
-                self.speed_right, self.getDistanceFromGround()]
+            [linear[0], linear[1], angular[0], angular[1], self.speed_left, self.speed_right, self.getDistanceFromGround()]
         )
         predict_input = predict_input.reshape(1, predict_input.shape[0])
 
-        # on ajoute les precedents inputs
-        input = np.hstack((predict_input, self.prec_input[1]))
-
-        # update du tableau pour reinjecter l'inputs actuelle dans la prochaine predict
-        self.prec_input[0] = self.prec_input[1]
-        self.prec_input[1] = predict_input
-
-        pred_left, pred_right = self.model.predict_on_batch(predict_input)[0]
+        pred_left = self.model.predict_on_batch(predict_input)[0][0]
         self.speed_left = min(100, pred_left * 100)
-        self.speed_right = min(100, pred_right * 100)
+        self.speed_right = min(100, pred_left * 100)
 
     def getLinearAndAngularSpeed(self):
         linear, angular = p.getBaseVelocity(self.robotId)
@@ -122,44 +111,21 @@ class Robot:
 
     def getDistanceFromGround(self):
         # x z y, le y nous indique la proximité du sol et le centre du robot
-        cubePos, cubeOrn = p.getBasePositionAndOrientation(self.robotId)
-        return cubePos[2]  # y, si < 0.15, on peut estimer qu'il est horizontal
+        pos, _ = p.getBasePositionAndOrientation(self.robotId)
+        return pos[2]  # y, si < 0.15, on peut estimer qu'il est horizontal
 
     def angle(self, v1, v2):
-        # calcul d'angle entre les 2 vecteurs sur le plan horizontal
-        print("==:", v1)
-        print(v2)
-        #produit_scalaire = v1[0]*v2[0] + v1[2]*v2[2]
-        #n1 = math.hypot(v1[0], v1[2])
-        #n2 = math.hypot(v2[0], v2[2])
-        return math.acos( (v1[0]*v2[0] + v1[2]*v2[2]) / (math.hypot(v1[0], v1[2]) * math.hypot(v2[0], v2[2])) )
-
+        return math.acos((v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2]) / (math.sqrt(v1[0]**2 + v1[1]**2 + v1[2]**2) * math.sqrt(v2[0]**2 + v2[1]**2 + v2[2]**2)))
 
     def getAngleWithGround(self):
         pass
 
     def computeFitness(self):
-        """
-        ON CALCULE LA FITNESS A LA FIN
-
-        Pour la fitness, on regarde la distance parcourue
-        ainsi que s'il est couché sur le sol ou toujours debout.
-
-        Plus on est proche de 1 donc de la position debout
-        plus on gagne de point
-
-                "means_distance_from_ground" est calculé à nouveau à chaque step
-                pour avoir la moyenne de la run
-
-        50 % pour le nombre de tick resté debout
-        25 % pour "means_distance_from_ground"
-        25 % pour la distance parcourue depuis le départ de la run pour le robot
-        """
-
-        # mean_diff_vittesse agit comme une penalite, on peut ajuster son importance
-        # la distance moyenne au sol est "inverse" puis mise au carre pour accentuer l'effet positif ou negatif d'etre droit ou penche
-        print(self.mean_diff_ori * 10)
-        return (self.tick_stand_up) * (1 - self.means_distance_from_ground)**2 - (self.mean_diff_vitesse / 10) - self.mean_diff_ori
+        # mean_diff_vittesse agit comme une penalite, on peut ajuster son importance, elle n'est utile que dans le cas ou le robot controle les 2 roues
+        # mean_diff_ori agit comme une penalite, on peut ajuster son importance, elle n'est utile que dans le cas ou le robot controle les 2 roues
+        # la distance moyenne au sol est "inverse" pour recompenser les robots qui restent bien droit
+        print(self.mean_diff_ori / 20)
+        return (self.tick_stand_up) * ((1 - self.means_distance_from_ground) * 10) # - self.mean_diff_ori / 20  # - (self.mean_diff_vitesse / 10)
 
     def reset(self):
         self.alive = True

@@ -10,7 +10,7 @@ from genetic import *
 
 
 class Gen_algo:
-    def __init__(self, graphic=False, nb_steps=100000, nb_start_pop=100, nb_gen=10000, load=False):
+    def __init__(self, graphic=False, nb_steps=1000000000000000000, nb_start_pop=100, nb_gen=1000000000, load=False):
         self.nb_steps = nb_steps  # nb de move par run
         self.nb_start_pop = nb_start_pop  # nb de robot dans la pop de depart
         self.list_genes = []
@@ -19,7 +19,10 @@ class Gen_algo:
         models = []
         # on recupere des models sauvegardes sur le disk
         if load:
-            models.append(self.load_genes_from_disk(6))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
+            models.append(self.load_genes_from_disk(2))
 
         self.env = Env(graphic=graphic, nb_robot=nb_start_pop, models=models)
 
@@ -30,12 +33,11 @@ class Gen_algo:
         self.nb_to_cross = self.nb_start_pop - int(self.nb_boss * 0.2)
 
         print("---------PARAMETERS----------")
-        print("nb_start_pop: ",self.nb_start_pop)
-        print("nb_boss: ",self.nb_boss)
-        print("nb_children_from_each_cross: ",self.nb_children_from_each_cross)
-        print("nb_to_cross: ",self.nb_to_cross)
+        print("nb_start_pop: ", self.nb_start_pop)
+        print("nb_boss: ", self.nb_boss)
+        print("nb_children_from_each_cross: ", self.nb_children_from_each_cross)
+        print("nb_to_cross: ", self.nb_to_cross)
         self.best_fitness = -1
-
 
     def start(self):
         # boucle de generation
@@ -78,7 +80,6 @@ class Gen_algo:
             for robot in list_robots:
                 new_list_genes.append(robot.model.get_weights())
 
-
             new_list_genes = selection(new_list_genes, self.nb_to_cross)
 
             # Si on selectionne pas assez de gene
@@ -100,40 +101,17 @@ class Gen_algo:
         self.env.disconnect()
 
     def save_to_disk(self, model):
-
         # sauvegarde le model dans le fichier best1.h5
         return model.save_weights('best1.h5')
-
-        # data = {}
-        # data['genes1'] = []
-        # for i in range(len(weights)):
-        #     data['genes1'].append({weights[i]})
-        #
-        #
-        # with open('data.txt', 'w') as outfile:
-        #     json.dump(data, outfile)
 
     def load_genes_from_disk(self, choice):
         model = gen_NN()
         if choice == 1:
-            # charge un model fitness 50
-            file = "best_50.h5"
-        elif choice == 2:
             # charge le best model de la session precedentes qui
             # est ensuite remplace par le best de la session en cours
             file = "best1.h5"
-        if choice == 3:
-            # charge un model fitness 50
-            file = "best_3000.h5"
-        if choice == 4:
-            # charge un model fitness 50
-            file = "best_5000.h5"
-        if choice == 5:
-            # charge un model fitness 50
-            file = "best2_300.h5"
-        if choice == 6:
-            # charge un model fitness 50
-            file = "best2_1500.h5"
+        elif choice == 2:
+            file = "model_1.h5"
 
         model.load_weights(file)
         return model
